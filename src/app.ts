@@ -1,14 +1,8 @@
-import express, { Request, Response } from "express";
-import { MovieRoutes } from "./modules/movies/movie.route";
+import express, { Request, Response } from 'express';
 const app = express();
 
-//parsers
-app.use(express.json());
-
-app.use("/api/movies", MovieRoutes);
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello Next!");
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello Next!!!!');
 });
 
 export default app;
