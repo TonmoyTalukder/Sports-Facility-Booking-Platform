@@ -36,7 +36,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 startServer();
-// Graceful shutdown handling
+// Shutdown handling
 process.on('SIGTERM', () => {
     console.log('SIGTERM signal received: closing HTTP server');
     if (server) {
@@ -46,7 +46,7 @@ process.on('SIGTERM', () => {
             mongoose_1.default.connection.close()
                 .then(() => {
                 console.log('MongoDB connection closed');
-                process.exit(0); // Graceful exit
+                process.exit(0); // Exit
             })
                 .catch((err) => {
                 console.error('Error closing MongoDB connection', err);
