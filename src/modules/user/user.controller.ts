@@ -23,7 +23,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
       phone,
       role,
       address,
-    }) as IUser & { _id: any }; // Explicitly typing newUser to ensure _id is recognized correctly
+    }) as IUser & { _id: any }; 
 
     await newUser.save();
 
@@ -58,7 +58,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Find the user by email
-    const user = await User.findOne({ email }) as IUser & { _id: any }; // Explicitly typing user to include _id
+    const user = await User.findOne({ email }) as IUser & { _id: any }; 
+
     if (!user) {
       console.log('User not found');
       res.status(404).json({

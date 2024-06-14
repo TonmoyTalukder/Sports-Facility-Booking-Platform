@@ -1,7 +1,7 @@
 // user.route.ts
 
 import { Router, Request, Response, NextFunction } from 'express';
-import { signUp, login } from './user.controller'; // Import both controllers
+import { signUp, login } from './user.controller'; 
 
 const router = Router();
 
