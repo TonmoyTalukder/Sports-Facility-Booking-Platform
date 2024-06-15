@@ -20,7 +20,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Ensure DB URL and Port are available
         if (!config_1.default.db_url || !config_1.default.port) {
-            throw new Error("Database URL and Port must be defined in the config");
+            throw new Error('Database URL and Port must be defined in the config');
         }
         // Connect to MongoDB
         yield mongoose_1.default.connect(config_1.default.db_url);
@@ -43,7 +43,8 @@ process.on('SIGTERM', () => {
         server.close(() => {
             console.log('HTTP server closed');
             // Closing the mongoose connection properly
-            mongoose_1.default.connection.close()
+            mongoose_1.default.connection
+                .close()
                 .then(() => {
                 console.log('MongoDB connection closed');
                 process.exit(0); // Exit

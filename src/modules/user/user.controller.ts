@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import User, { IUser } from './user.model';
-import { generateToken } from '../../utils/auth';
+import { generateToken } from '../../middleware/globalErrorhandler';
 import { CustomError } from '../../utils/error';
 
 export const signUp = async (req: Request, res: Response): Promise<void> => {
@@ -14,7 +14,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
         statusCode: 400,
         message: 'Email already registered',
       });
-      return; 
+      return;
     }
 
     const newUser = new User({
@@ -28,7 +28,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
 
     await newUser.save();
 
-    const token = generateToken(newUser._id.toString());
+    // const token = generateToken(newUser._id.toString());
 
     res.status(200).json({
       success: true,
@@ -46,7 +46,9 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
   } catch (error: any) {
     // console.error('Error during user signup:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);
@@ -58,7 +60,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Find the user by email
-    const user = await User.findOne({ email }) as IUser & { _id: any };
+    const user = (await User.findOne({ email })) as IUser & { _id: any };
 
     if (!user) {
       // console.log('User not found');
@@ -66,7 +68,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         success: false,
         statusCode: 404,
         message: 'No Data Found',
-        data: []
+        data: [],
       });
       return;
     }
@@ -104,7 +106,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error: any) {
     // console.error('Error during user login:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);

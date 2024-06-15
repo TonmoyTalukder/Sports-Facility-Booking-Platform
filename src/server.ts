@@ -3,14 +3,13 @@ import config from './config';
 import app from './app';
 import { Server } from 'http';
 
-
 let server: Server;
 
 const startServer = async () => {
   try {
     // Ensure DB URL and Port are available
     if (!config.db_url || !config.port) {
-      throw new Error("Database URL and Port must be defined in the config");
+      throw new Error('Database URL and Port must be defined in the config');
     }
 
     // Connect to MongoDB
@@ -35,9 +34,10 @@ process.on('SIGTERM', () => {
   if (server) {
     server.close(() => {
       console.log('HTTP server closed');
-      
+
       // Closing the mongoose connection properly
-      mongoose.connection.close()
+      mongoose.connection
+        .close()
         .then(() => {
           console.log('MongoDB connection closed');
           process.exit(0); // Exit

@@ -4,15 +4,15 @@ import {
   checkAvailability,
   createBooking,
   getAllBookings,
-  getBookingsByUser
+  getBookingsByUser,
 } from './booking.controller';
 import { protect } from '../../middleware/authMiddleware';
-import { validate } from '../../middleware/validate';
+import { validate } from '../../config';
 import {
   checkAvailabilitySchema,
   createBookingSchema,
   getBookingsByUserSchema,
-  cancelBookingSchema
+  cancelBookingSchema,
 } from './booking.validation';
 
 const bookingRouter = Router();
@@ -27,7 +27,7 @@ bookingRouter.get(
     } catch (error) {
       next(error); // Passes errors to the global error handler
     }
-  }
+  },
 );
 
 bookingRouter.post(
@@ -40,7 +40,7 @@ bookingRouter.post(
     } catch (error) {
       next(error); // Passes errors to the global error handler
     }
-  }
+  },
 );
 
 // View all bookings route (admin only)
@@ -53,7 +53,7 @@ bookingRouter.get(
     } catch (error) {
       next(error); // Passes errors to the global error handler
     }
-  }
+  },
 );
 
 // View bookings by user (user only)
@@ -67,7 +67,7 @@ bookingRouter.get(
     } catch (error) {
       next(error); // Passes errors to the global error handler
     }
-  }
+  },
 );
 
 // Cancel a booking (User Only)
@@ -81,7 +81,7 @@ bookingRouter.delete(
     } catch (error) {
       next(error); // Passes errors to the global error handler
     }
-  }
+  },
 );
 
 export default bookingRouter;

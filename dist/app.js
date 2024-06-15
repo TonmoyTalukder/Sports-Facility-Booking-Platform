@@ -13,9 +13,6 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 // Routes
-// app.use('/api', userRouter);
-// app.use('/api', facilityRouter);
-// app.use('/api', bookingRouter);
 app.use('/api', routes_1.default);
 app.get('/', (req, res) => {
     res.send('Welcome to the Sports Facility Booking Platform API');

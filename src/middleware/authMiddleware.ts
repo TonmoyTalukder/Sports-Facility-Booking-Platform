@@ -12,12 +12,19 @@ interface AuthenticatedRequest extends Request {
 
 // Protect middleware to ensure only authenticated users can access
 export const protect = (roles: string[] = []) => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response | void> => {
+  return async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | void> => {
     try {
       let token;
 
       // Check if the token is provided in the authorization header
-      if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+      ) {
         // Extract the token from the authorization header
         token = req.headers.authorization.split(' ')[1];
 
@@ -28,7 +35,7 @@ export const protect = (roles: string[] = []) => {
         req.user = { _id: decoded.id };
 
         // Retrieve the user from the database
-        const user = await User.findById(req.user._id) as IUser | null;
+        const user = (await User.findById(req.user._id)) as IUser | null;
         if (!user) {
           return res.status(404).json({
             success: false,
@@ -45,7 +52,7 @@ export const protect = (roles: string[] = []) => {
             message: 'Forbidden: You do not have access to this resource',
           });
         }
-        
+
         next();
       } else {
         throw new Error('Unauthorized: No token provided');

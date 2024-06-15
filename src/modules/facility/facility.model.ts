@@ -13,7 +13,7 @@ const FacilitySchema: Schema<IFacility> = new Schema({
   description: { type: String, required: true },
   pricePerHour: { type: Number, required: true },
   location: { type: String, required: true },
-  isDeleted: { type: Boolean, default: false }
+  isDeleted: { type: Boolean, default: false },
 });
 
 const Facility = mongoose.model<IFacility>('Facility', FacilitySchema);

@@ -3,9 +3,12 @@ import { z } from 'zod';
 // Schema for checking availability
 export const checkAvailabilitySchema = z.object({
   query: z.object({
-    date: z.string().min(1, 'Date is required').refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid date format for date',
-    }),
+    date: z
+      .string()
+      .min(1, 'Date is required')
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: 'Invalid date format for date',
+      }),
   }),
 });
 

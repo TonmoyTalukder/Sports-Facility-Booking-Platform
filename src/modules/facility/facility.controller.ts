@@ -4,7 +4,10 @@ import { Types } from 'mongoose';
 import { CustomError } from '../../utils/error';
 
 // Create a facility
-export const createFacility = async (req: Request, res: Response): Promise<void> => {
+export const createFacility = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { name, description, pricePerHour, location } = req.body;
 
   try {
@@ -33,16 +36,20 @@ export const createFacility = async (req: Request, res: Response): Promise<void>
   } catch (error: any) {
     // console.error('Error creating facility:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);
   }
 };
 
-
 // Update a facility by ID
-export const updateFacility = async (req: Request, res: Response): Promise<void> => {
+export const updateFacility = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { id } = req.params;
   const { name, description, pricePerHour, location } = req.body;
 
@@ -51,7 +58,7 @@ export const updateFacility = async (req: Request, res: Response): Promise<void>
     const updatedFacility = await Facility.findByIdAndUpdate(
       id,
       { name, description, pricePerHour, location },
-      { new: true, runValidators: true, lean: true } 
+      { new: true, runValidators: true, lean: true },
     );
 
     if (!updatedFacility) {
@@ -59,7 +66,7 @@ export const updateFacility = async (req: Request, res: Response): Promise<void>
         success: false,
         statusCode: 404,
         message: 'No Data Found',
-        data: []
+        data: [],
       });
       return;
     }
@@ -71,38 +78,42 @@ export const updateFacility = async (req: Request, res: Response): Promise<void>
       message: 'Facility updated successfully',
       data: {
         ...updatedFacility,
-        _id: updatedFacility._id.toString(), 
+        _id: updatedFacility._id.toString(),
       },
     });
   } catch (error: any) {
     // console.error('Error updating facility:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);
   }
 };
 
-
 // Soft delete a facility by ID (Admin Only)
-export const deleteFacility = async (req: Request, res: Response): Promise<void> => {
+export const deleteFacility = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { id } = req.params;
 
   try {
     // Find the facility by ID and update its isDeleted field to true
-    const deletedFacility = await Facility.findByIdAndUpdate(
+    const deletedFacility = (await Facility.findByIdAndUpdate(
       id,
       { isDeleted: true },
-      { new: true } // Return the updated document
-    ) as (IFacility & { _id: Types.ObjectId }) | null; // Use type assertion here
+      { new: true }, // Return the updated document
+    )) as (IFacility & { _id: Types.ObjectId }) | null; // Use type assertion here
 
     if (!deletedFacility) {
       res.status(404).json({
         success: false,
         statusCode: 404,
         message: 'No Data Found',
-        data: []
+        data: [],
       });
       return;
     }
@@ -112,7 +123,7 @@ export const deleteFacility = async (req: Request, res: Response): Promise<void>
       statusCode: 200,
       message: 'Facility deleted successfully',
       data: {
-        _id: deletedFacility._id.toString(), 
+        _id: deletedFacility._id.toString(),
         name: deletedFacility.name,
         description: deletedFacility.description,
         pricePerHour: deletedFacility.pricePerHour,
@@ -123,19 +134,25 @@ export const deleteFacility = async (req: Request, res: Response): Promise<void>
   } catch (error: any) {
     // console.error('Error deleting facility:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);
   }
 };
 
-
 // Get all facilities
-export const getAllFacilities = async (req: Request, res: Response): Promise<void> => {
+export const getAllFacilities = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     // Find all facilities
-    const facilities = await Facility.find({}).lean() as (IFacility & { _id: string })[];
+    const facilities = (await Facility.find({}).lean()) as (IFacility & {
+      _id: string;
+    })[];
 
     if (facilities.length === 0) {
       res.status(404).json({
@@ -151,7 +168,7 @@ export const getAllFacilities = async (req: Request, res: Response): Promise<voi
       success: true,
       statusCode: 200,
       message: 'Facilities retrieved successfully',
-      data: facilities.map(facility => ({
+      data: facilities.map((facility) => ({
         _id: facility._id.toString(),
         name: facility.name,
         description: facility.description,
@@ -163,7 +180,9 @@ export const getAllFacilities = async (req: Request, res: Response): Promise<voi
   } catch (error: any) {
     // console.error('Error retrieving facilities:', error);
     if (error.code === 11000) {
-      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [
+        { path: '', message: error.message },
+      ]);
     }
 
     throw new CustomError('Server error. Please try again later.', 500);

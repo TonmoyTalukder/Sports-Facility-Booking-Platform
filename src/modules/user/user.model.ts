@@ -17,7 +17,7 @@ const UserSchema: Schema<IUser> = new Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   role: { type: String, enum: ['admin', 'user'], default: 'user' },
-  address: { type: String, required: true }
+  address: { type: String, required: true },
 });
 
 UserSchema.pre('save', async function (next) {
@@ -29,7 +29,9 @@ UserSchema.pre('save', async function (next) {
   return next();
 });
 
-UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+UserSchema.methods.comparePassword = async function (
+  candidatePassword: string,
+): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
