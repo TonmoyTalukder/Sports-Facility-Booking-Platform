@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import User, { IUser } from './user.model';
 import { generateToken } from '../../utils/auth';
+import { CustomError } from '../../utils/error';
 
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password, phone, role, address } = req.body;
@@ -23,7 +24,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
       phone,
       role,
       address,
-    }) as IUser & { _id: any }; 
+    }) as IUser & { _id: any };
 
     await newUser.save();
 
@@ -42,14 +43,13 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
         address: newUser.address,
       },
     });
-  } catch (error) {
-    console.error('Error during user signup:', error);
-    res.status(500).json({
-      success: false,
-      statusCode: 500,
-      message: 'Server error. Please try again later.',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+  } catch (error: any) {
+    // console.error('Error during user signup:', error);
+    if (error.code === 11000) {
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+    }
+
+    throw new CustomError('Server error. Please try again later.', 500);
   }
 };
 
@@ -58,14 +58,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Find the user by email
-    const user = await User.findOne({ email }) as IUser & { _id: any }; 
+    const user = await User.findOne({ email }) as IUser & { _id: any };
 
     if (!user) {
-      console.log('User not found');
+      // console.log('User not found');
       res.status(404).json({
         success: false,
         statusCode: 404,
-        message: 'Invalid email or password',
+        message: 'No Data Found',
+        data: []
       });
       return;
     }
@@ -100,13 +101,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         address: user.address,
       },
     });
-  } catch (error) {
-    console.error('Error during user login:', error);
-    res.status(500).json({
-      success: false,
-      statusCode: 500,
-      message: 'Server error. Please try again later.',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
+  } catch (error: any) {
+    // console.error('Error during user login:', error);
+    if (error.code === 11000) {
+      throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+    }
+
+    throw new CustomError('Server error. Please try again later.', 500);
   }
 };

@@ -3,6 +3,7 @@ import Booking, { IBooking } from './booking.model';
 import Facility, { IFacility } from '../facility/facility.model';
 import moment from 'moment';
 import { Document, Types } from 'mongoose';
+import { CustomError } from '../../utils/error';
 
 
 interface AuthenticatedRequest extends Request {
@@ -10,7 +11,7 @@ interface AuthenticatedRequest extends Request {
         _id: string;
     };
 }
-
+// Check the availability of time slots for booking on a specific date 
 export const checkAvailability = async (req: Request, res: Response): Promise<void> => {
     try {
         // Get the date from the query parameters or default to today's date
@@ -49,20 +50,30 @@ export const checkAvailability = async (req: Request, res: Response): Promise<vo
             });
         });
 
+        // Check if availableSlots array is empty
+        if (availableSlots.length === 0) {
+            res.status(404).json({
+                success: false,
+                statusCode: 404,
+                message: 'No Data Found',
+                data: [],
+            });
+            return;
+        }
+
         res.status(200).json({
             success: true,
             statusCode: 200,
             message: 'Availability checked successfully',
             data: availableSlots,
         });
-    } catch (error) {
-        console.error('Error checking availability:', error);
-        res.status(500).json({
-            success: false,
-            statusCode: 500,
-            message: 'Server error. Please try again later.',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    } catch (error: any) {
+        // console.error('Error checking availability:', error);
+        if (error.code === 11000) {
+            throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+        }
+
+        throw new CustomError('Server error. Please try again later.', 500);
     }
 };
 
@@ -116,7 +127,8 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
             res.status(404).json({
                 success: false,
                 statusCode: 404,
-                message: 'Facility not found',
+                message: 'No Data Found',
+                data: []
             });
             return;
         }
@@ -172,18 +184,17 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
                 isBooked: savedBooking.isBooked,
             },
         });
-    } catch (error) {
-        console.error('Error creating booking:', error);
-        res.status(500).json({
-            success: false,
-            statusCode: 500,
-            message: 'Server error. Please try again later.',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    } catch (error: any) {
+        // console.error('Error creating booking:', error);
+        if (error.code === 11000) {
+            throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+        }
+
+        throw new CustomError('Server error. Please try again later.', 500);
     }
 };
 
-// Function to get all bookings (admin only)
+// Get all bookings (admin only)
 export const getAllBookings = async (req: Request, res: Response): Promise<void> => {
     try {
         // Fetch all bookings and populate facility and user details
@@ -202,7 +213,8 @@ export const getAllBookings = async (req: Request, res: Response): Promise<void>
             res.status(404).json({
                 success: false,
                 statusCode: 404,
-                message: 'No bookings found',
+                message: 'No Data Found',
+                data: []
             });
             return;
         }
@@ -222,18 +234,17 @@ export const getAllBookings = async (req: Request, res: Response): Promise<void>
                 isBooked: booking.isBooked,
             })),
         });
-    } catch (error) {
-        console.error('Error retrieving bookings:', error);
-        res.status(500).json({
-            success: false,
-            statusCode: 500,
-            message: 'Server error. Please try again later.',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    } catch (error: any) {
+        // console.error('Error retrieving bookings:', error);
+        if (error.code === 11000) {
+            throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+        }
+
+        throw new CustomError('Server error. Please try again later.', 500);
     }
 };
 
-// Function to get bookings by user (user only)
+// Get bookings by user (user only)
 export const getBookingsByUser = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         // Get the authenticated user ID from the request
@@ -261,7 +272,8 @@ export const getBookingsByUser = async (req: AuthenticatedRequest, res: Response
             res.status(404).json({
                 success: false,
                 statusCode: 404,
-                message: 'No bookings found for the user',
+                message: 'No Data Found',
+                data: []
             });
             return;
         }
@@ -281,17 +293,17 @@ export const getBookingsByUser = async (req: AuthenticatedRequest, res: Response
                 isBooked: booking.isBooked,
             })),
         });
-    } catch (error) {
-        console.error('Error retrieving user bookings:', error);
-        res.status(500).json({
-            success: false,
-            statusCode: 500,
-            message: 'Server error. Please try again later.',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    } catch (error: any) {
+        // console.error('Error retrieving user bookings:', error);
+        if (error.code === 11000) {
+            throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+        }
+
+        throw new CustomError('Server error. Please try again later.', 500);
     }
 };
 
+// Cancel booking by user (user only)
 export const cancelBooking = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     const userId = req.user?._id;
     const bookingId = req.params.id;
@@ -310,7 +322,8 @@ export const cancelBooking = async (req: AuthenticatedRequest, res: Response): P
             res.status(404).json({
                 success: false,
                 statusCode: 404,
-                message: 'Booking not found or facility not populated',
+                message: 'No Data Found',
+                data: []
             });
             return;
         }
@@ -343,7 +356,7 @@ export const cancelBooking = async (req: AuthenticatedRequest, res: Response): P
                     location: facility.location,
                     isDeleted: facility.isDeleted,
                 },
-                date: formattedDate, 
+                date: formattedDate,
                 startTime: formattedStartTime,
                 endTime: formattedEndTime,
                 user: savedBooking.user,
@@ -352,13 +365,12 @@ export const cancelBooking = async (req: AuthenticatedRequest, res: Response): P
             },
         });
 
-    } catch (error) {
-        console.error('Error canceling booking:', error);
-        res.status(500).json({
-            success: false,
-            statusCode: 500,
-            message: 'Server error. Please try again later.',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
+    } catch (error: any) {
+        // console.error('Error canceling booking:', error);
+        if (error.code === 11000) {
+            throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
+        }
+
+        throw new CustomError('Server error. Please try again later.', 500);
     }
 };
