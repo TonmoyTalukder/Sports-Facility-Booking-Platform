@@ -149,9 +149,9 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
             return;
         }
 
-        // Calculate payable amount
+        // Calculate payable amount {{ payableAmount = (endTime - startTime) * pricePerHour }}
         const durationInHours = moment.duration(bookingEnd.diff(bookingStart)).asHours();
-        const payableAmount = durationInHours * facilityDoc.pricePerHour; // Adjust as per your pricing logic
+        const payableAmount = durationInHours * facilityDoc.pricePerHour; 
 
         // Create the new booking
         const newBooking: IBooking = new Booking({
@@ -161,7 +161,7 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
             endTime: bookingEnd.toDate(),
             user: userId,
             payableAmount,
-            isBooked: 'confirmed', // Assuming default status for new bookings
+            isBooked: 'confirmed', 
         });
 
         // Save the booking
@@ -325,9 +325,8 @@ export const cancelBooking = async (req: AuthenticatedRequest, res: Response): P
             return;
         }
 
-        // Assign the populated facility to a variable of type `any`
         const populatedFacility: any = updatedBooking.facility;
-        const facility = populatedFacility as IFacility; // Cast to IFacility
+        const facility = populatedFacility as IFacility; 
 
         // Update booking status to "canceled"
         updatedBooking.isBooked = 'canceled';

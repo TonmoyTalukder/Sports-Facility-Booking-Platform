@@ -45,8 +45,7 @@ export const protect = (roles: string[] = []) => {
             message: 'Forbidden: You do not have access to this resource',
           });
         }
-
-        // Proceed to the next middleware or route handler
+        
         next();
       } else {
         throw new Error('Unauthorized: No token provided');

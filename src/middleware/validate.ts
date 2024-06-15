@@ -11,7 +11,6 @@ export const validate = (schema: AnyZodObject) => (req: Request, res: Response, 
     next(); // Proceed if validation passes
   } catch (error) {
     if (error instanceof ZodError) {
-      // Format Zod error messages
       const errorMessages = error.errors.map(err => ({
         path: err.path.join('.'),
         message: err.message,

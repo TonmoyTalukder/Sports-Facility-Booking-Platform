@@ -14,7 +14,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
         statusCode: 400,
         message: 'Email already registered',
       });
-      return; // Exit the function after sending the response
+      return; 
     }
 
     const newUser = new User({

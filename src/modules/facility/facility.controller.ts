@@ -51,7 +51,7 @@ export const updateFacility = async (req: Request, res: Response): Promise<void>
     const updatedFacility = await Facility.findByIdAndUpdate(
       id,
       { name, description, pricePerHour, location },
-      { new: true, runValidators: true, lean: true } // using lean()
+      { new: true, runValidators: true, lean: true } 
     );
 
     if (!updatedFacility) {
@@ -71,7 +71,7 @@ export const updateFacility = async (req: Request, res: Response): Promise<void>
       message: 'Facility updated successfully',
       data: {
         ...updatedFacility,
-        _id: updatedFacility._id.toString(), // Ensure _id is a string
+        _id: updatedFacility._id.toString(), 
       },
     });
   } catch (error: any) {
@@ -112,7 +112,7 @@ export const deleteFacility = async (req: Request, res: Response): Promise<void>
       statusCode: 200,
       message: 'Facility deleted successfully',
       data: {
-        _id: deletedFacility._id.toString(), // Ensure _id is recognized as a string
+        _id: deletedFacility._id.toString(), 
         name: deletedFacility.name,
         description: deletedFacility.description,
         pricePerHour: deletedFacility.pricePerHour,
