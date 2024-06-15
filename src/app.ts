@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import userRoutes from './modules/user/user.routes'; // Example route import
+import userRouter from './modules/user/user.routes';
+import facilityRouter from './modules/facility/facility.route';
+import bookingRouter from './modules/booking/booking.route';
 
 const app = express();
 
@@ -9,7 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api', userRoutes);
+app.use('/api', userRouter);
+app.use('/api', facilityRouter);
+app.use('/api', bookingRouter);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the Sports Facility Booking Platform API');

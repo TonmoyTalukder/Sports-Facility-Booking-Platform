@@ -3,6 +3,7 @@ import config from './config';
 import app from './app';
 import { Server } from 'http';
 
+
 let server: Server;
 
 const startServer = async () => {
