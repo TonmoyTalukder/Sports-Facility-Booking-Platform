@@ -194,9 +194,9 @@ export const createBooking = async (
     const savedBooking = (await newBooking.save()) as IBooking &
       Document & { _id: Types.ObjectId };
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      statusCode: 201,
+      statusCode: 200,
       message: 'Booking created successfully',
       data: {
         _id: savedBooking._id.toString(),
