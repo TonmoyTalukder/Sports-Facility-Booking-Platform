@@ -1,5 +1,3 @@
-// authMiddleware.ts
-
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User, { IUser } from '../modules/user/user.model';
@@ -35,7 +33,7 @@ export const protect = (roles: string[] = []) => {
           return res.status(404).json({
             success: false,
             statusCode: 404,
-            message: 'User not found',
+            message: 'Not found',
           });
         }
 

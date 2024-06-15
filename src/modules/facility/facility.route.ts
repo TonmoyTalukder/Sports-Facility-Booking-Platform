@@ -1,13 +1,16 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { createFacility, deleteFacility, getAllFacilities, updateFacility } from './facility.controller';
 import { protect } from '../../middleware/authMiddleware';
+import { validate } from '../../middleware/validate';
+import { createFacilitySchema, updateFacilitySchema, deleteFacilitySchema } from './facility.validation';
 
 const facilityRouter = Router();
 
 // Route to create a new facility, only accessible by admin
 facilityRouter.post(
-    '/facility',
+    '/',
     protect(['admin']), // Ensuring only admins can create facilities
+    validate(createFacilitySchema), // Validate request body for creating a facility
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             await createFacility(req, res);
@@ -19,8 +22,9 @@ facilityRouter.post(
 
 // Update an existing facility (Admin only)
 facilityRouter.put(
-    '/facility/:id',
+    '/:id',
     protect(['admin']),
+    validate(updateFacilitySchema), // Validate request params and body for updating a facility
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             await updateFacility(req, res);
@@ -32,8 +36,9 @@ facilityRouter.put(
 
 // Soft delete a facility by ID (Admin Only)
 facilityRouter.delete(
-    '/facility/:id',
+    '/:id',
     protect(['admin']),
+    validate(deleteFacilitySchema), // Validate request params for deleting a facility
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             await deleteFacility(req, res);
@@ -45,7 +50,7 @@ facilityRouter.delete(
 
 // Route to get all facilities
 facilityRouter.get(
-    '/facility/',
+    '/',
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             await getAllFacilities(req, res);

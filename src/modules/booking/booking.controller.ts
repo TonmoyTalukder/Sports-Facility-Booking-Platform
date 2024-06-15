@@ -81,7 +81,6 @@ export const checkAvailability = async (req: Request, res: Response): Promise<vo
 export const createBooking = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
     try {
         const { facility, date, startTime, endTime } = req.body;
-        // Get the authenticated user ID from the request
         const userId = req.user?._id;
 
         // Ensure userId is valid
@@ -127,8 +126,7 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
             res.status(404).json({
                 success: false,
                 statusCode: 404,
-                message: 'No Data Found',
-                data: []
+                message: 'Facility not found',
             });
             return;
         }
@@ -153,25 +151,25 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
 
         // Calculate payable amount
         const durationInHours = moment.duration(bookingEnd.diff(bookingStart)).asHours();
-        const payableAmount = durationInHours * (facilityDoc as any).pricePerHour;
+        const payableAmount = durationInHours * facilityDoc.pricePerHour; // Adjust as per your pricing logic
 
         // Create the new booking
-        const newBooking = new Booking({
+        const newBooking: IBooking = new Booking({
             facility,
             date: bookingDate.toDate(),
             startTime: bookingStart.toDate(),
             endTime: bookingEnd.toDate(),
             user: userId,
             payableAmount,
-            isBooked: 'confirmed',
+            isBooked: 'confirmed', // Assuming default status for new bookings
         });
 
         // Save the booking
         const savedBooking = await newBooking.save() as IBooking & Document & { _id: Types.ObjectId };
 
-        res.status(200).json({
+        res.status(201).json({
             success: true,
-            statusCode: 200,
+            statusCode: 201,
             message: 'Booking created successfully',
             data: {
                 _id: savedBooking._id.toString(),
@@ -185,7 +183,6 @@ export const createBooking = async (req: AuthenticatedRequest, res: Response): P
             },
         });
     } catch (error: any) {
-        // console.error('Error creating booking:', error);
         if (error.code === 11000) {
             throw new CustomError(`Duplicate entry: ${error.message}`, 400, [{ path: '', message: error.message }]);
         }
